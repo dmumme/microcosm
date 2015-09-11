@@ -1,0 +1,61 @@
+//CUBLAS_CHECK_RETURN(cublasSaxpy(*pHandle, outputDim, &alpha, dev_deltas, 1, biasWeights, 1));
+
+
+	thrust::device_vector<float> const& lastLayer = layers[layers.size() - 1];
+
+	assert(input.size() == layers[0].size() && output.size() == lastLayer.size());
+
+	thrust::copy(input.begin(), input.end(), layers[0].begin());
+	for (int layerNum = 1; layerNum < layers.size(); layerNum++) {
+		layers[layerNum].clear();
+	}
+
+	for (int layerNum = 1; layerNum < layers.size(); layerNum++) {
+		thrust::device_vector< thrust::device_vector<float> > const& matrix = matrixList[layerNum - 1];
+		// TODO: matrixTimesVector(matrix, layers[layerNum - 1], layers[layerNum]);
+		// TODO: applyFunctionToVector(layers[layerNum], activationFunction);
+	}
+	thrust::copy(lastLayer.begin(), lastLayer.end(), output.begin());
+
+	/*
+struct selected_gpu_properties {
+  int regsPerBlock;
+  int regsPerMultiprocessor;
+
+  int maxGridSize;
+  int maxThreadsPerMultiProcessor;
+  int maxThreadsPerBlock;
+
+  int sharedMemPerBlock;
+  int sharedMemPerMultiprocessor;
+  int totalConstMem;
+  int totalGlobalMem;
+  int unifiedAddressing;
+  int warpSize;
+};
+*/
+
+	cout << "specList.size() = " << specList.size() << endl;
+	for (unsigned i = 0; i < specList.size(); i++) {
+		vector<int> dimensions = specList[i];
+		cout << "dimensions for network " << i << ":" << endl;
+		for (unsigned j = 0; j < dimensions.size(); j++) {
+			cout << "  " << dimensions[j];
+		}
+		cout << endl;
+	}
+	
+	
+	cout << "*** Showing neural network layer stats" << endl;
+	cout << "Number of networks specified: " << neuralNetworkSpecList.size() << endl;
+	for (unsigned i = 0; i < neuralNetworkSpecList.size(); i++) {
+		BPNeuralNetwork* pNet = neuralNetworkList[i];
+		cout << "NNet # " << i << ", number of layers: "
+		 << pNet->layerDimensionList.size() << endl;
+		for (unsigned j = 0; j < pNet->layerDimensionList.size(); j++) {
+			cout << "  " << pNet->layerDimensionList[j];
+		}
+		cout << endl;
+	}
+	cout << "*** END NNet list" << endl;
+	
